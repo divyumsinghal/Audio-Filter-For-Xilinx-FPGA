@@ -6,6 +6,7 @@ load('BandstopFilterHd_Standard.mat',    'Hd_Standard');              % loads th
 load('BandstopFilterHd_Standard_8.mat',  'Hd_Standard_8');            % loads the filter object back into workspace
 load('BandstopFilterHd_Standard_16.mat', 'Hd_Standard_16');           % loads the filter object back into workspace
 load('BandstopFilterHd_Standard_32.mat', 'Hd_Standard_32');           % loads the filter object back into workspace
+load('BandstopFilterHd_Standard_64.mat', 'Hd_Standard_64');           % loads the filter object back into workspace
 
 [x, Fs] = audioread('speech_38.wav');   % Read audio file
 
@@ -111,6 +112,8 @@ y_16    = filter(Hd_Standard_16, x);    % Apply FIR filter as desgined in fD
 y_16    = double(y_16);                 % Convert
 y_32    = filter(Hd_Standard_32, x);    % Apply FIR filter as desgined in fD
 y_32    = double(y_32);                 % Convert
+y_64    = Hd_Standard_64(x);    % Apply FIR filter as desgined in fD
+y_64    = double(y_64);                 % Convert
 
 
 % Analyze filtered signal
@@ -118,11 +121,13 @@ Y       = fft(y, nfft);
 Y_8     = fft(y_8, nfft);
 Y_16    = fft(y_16, nfft);
 Y_32    = fft(y_32, nfft);
+Y_64    = fft(y_64, nfft);
 
 fresp_filtered      = 2*abs(Y(1:nfft/2));
 fresp_filtered_8    = 2*abs(Y_8(1:nfft/2));
 fresp_filtered_16   = 2*abs(Y_16(1:nfft/2));
 fresp_filtered_32   = 2*abs(Y_32(1:nfft/2));
+fresp_filtered_64   = 2*abs(Y_64(1:nfft/2));
 
 figure;
 plot(fvec, fresp, 'r-', 'DisplayName', 'Original', 'LineWidth', 1);
@@ -132,6 +137,7 @@ plot(fvec, fresp_filtered,      'b-',   'DisplayName', 'Filtered',      'LineWid
 plot(fvec, fresp_filtered_8,    'g--',  'DisplayName', 'Filtered_8',    'LineWidth', 1);
 plot(fvec, fresp_filtered_16,   'm--',  'DisplayName', 'Filtered_16',   'LineWidth', 1);
 plot(fvec, fresp_filtered_32,   'c--',  'DisplayName', 'Filtered_32',   'LineWidth', 1);
+plot(fvec, fresp_filtered_64,   'c-*',  'DisplayName', 'Filtered_64',   'LineWidth', 1);
 
 title('Frequency Spectrum Before and After Filtering');
 xlabel('Frequency (Hz)');
@@ -144,6 +150,7 @@ audiowrite('speech_filtered.wav',       y,      Fs);
 audiowrite('speech_filtered_8.wav',     y_8,    Fs);
 audiowrite('speech_filtered_16.wav',    y_16,   Fs);
 audiowrite('speech_filtered_32.wav',    y_32,   Fs);
+audiowrite('speech_filtered_64.wav',    y_64,   Fs);
 
 % Listen to both
 pause_dur = length(x)/Fs + 1;
@@ -180,6 +187,11 @@ disp(['Filter Order: ', num2str(Order)]);
 fvtool(b, 1, 'Fs', Fs)
 
 b = Hd_Standard_32.Numerator;
+Order = length(b) - 1;
+disp(['Filter Order: ', num2str(Order)]);
+fvtool(b, 1, 'Fs', Fs)
+
+b = Hd_Standard_64.Numerator;
 Order = length(b) - 1;
 disp(['Filter Order: ', num2str(Order)]);
 fvtool(b, 1, 'Fs', Fs)
